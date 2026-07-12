@@ -5,11 +5,17 @@
 #include <random>
 #include <thread>
 
+inline std::mutex coutMtx;
 
-void sleepTask(int numSeconds) {
-	std::cout << "Sleeping " << numSeconds << "seconds" << std::endl;
+void sleepTask(int numSeconds) 
+{
+	std::unique_lock<std::mutex> lock(coutMtx);
+	std::cout << "Sleeping " << numSeconds << " seconds" << std::endl;
+	lock.unlock();
 	std::this_thread::sleep_for(std::chrono::seconds(numSeconds));
+	lock.lock();
 	std::cout << "Get up" << std::endl;
+	lock.unlock();
 }
 
 

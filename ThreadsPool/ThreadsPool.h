@@ -22,6 +22,7 @@ private:
 
 	std::vector<bool> stateIsIdle;        
 	std::vector<std::string> namesTask;
+	std::atomic<size_t> totalQuantityTasks;
 
 public:
 	explicit ThreadPool(size_t numThreads)
@@ -44,7 +45,8 @@ public:
 					namesTask[i] = current.nameTask;
 
 					lock.unlock();       
-					current.function();     
+					current.function();  
+					++totalQuantityTasks;
 					lock.lock();        
 
 					stateIsIdle[i] = true;
@@ -69,10 +71,20 @@ public:
 		for (size_t i = 0; i < threads.size(); ++i)
 		{
 			std::cout << "Thread: " << i << ", threadID: " << threads[i].get_id();
-			std::cout << "State of thred: << " << stateIsIdle[i] << ", ";
-			std::cout << "Name of thred: << " << namesTask[i] << " ";
+			std::cout << ", State of thred: " << stateIsIdle[i] << ", ";
+			std::cout << "Name of thred: " << namesTask[i] << " ";
 			std::cout << " " << std::endl;
 			std::cout << std::endl;
+		}
+	}
+
+	void shutdown()
+	{
+		workingPool = false;
+		cv.notify_all();
+		for (std::thread& t : threads)
+		{
+			t.join();
 		}
 	}
 
