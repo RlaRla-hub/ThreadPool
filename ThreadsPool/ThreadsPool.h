@@ -4,6 +4,7 @@
 #include <queue>
 #include <condition_variable>
 #include <functional>
+#include <future>
 
 struct Task
 {
@@ -62,6 +63,18 @@ public:
 		Task currentTask = { task, nameTask };
 		tasks.push(currentTask);
 		cv.notify_one();
+	}
+
+	template <typename T>
+	std::future<T> addTaskWithResult(std::function<T()> task, const std::string& nameTask)
+	{
+		std::shared_ptr<std::packaged_task<T()>> taskWithResult = std::make_shared<std::packaged_task<T()>>(std::move(task));
+		std::future<T> future = taskWithResult->get_future();
+		std::lock_guard<std::mutex> lock(mtx);
+		Task currentTask = { [taskWithResult]() { (*taskWithResult)(); }, nameTask };
+		tasks.push(currentTask);
+		cv.notify_one();
+		return future;
 	}
 
 	void getThreadPoolInfo()
