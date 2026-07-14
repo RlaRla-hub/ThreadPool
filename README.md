@@ -32,14 +32,14 @@
 Инструкции по скачиванию и настройке:
 git clone https://github.com/RlaRla-hub/ThreadPool.git
 
-Сборка:
-cd путь_к_проекту/ThreadPool
-mkdir build && cd build
-cmake ..
-make
+Сборка:  
+cd путь_к_проекту/ThreadPool  
+mkdir build && cd build  
+cmake ..  
+make  
 
-Запуск:
-./thread_pool
+Запуск:  
+./thread_pool  
 
 
 ```bash
